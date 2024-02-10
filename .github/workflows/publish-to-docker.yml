@@ -30,4 +30,4 @@ jobs:
         with:
           push: true
           tags: godwin42sh/udpproxy:latest
-          context: ./src
+          context: .
