@@ -1,10 +1,11 @@
 [package]
 name = "udpproxy"
-version = "0.1.0"
-authors = ["Mahmoud Al-Qudsi <mqudsi@neosmart.net>"]
+version = "0.2.0"
+edition = "2021"
+authors = ["Mahmoud Al-Qudsi <mqudsi@neosmart.net>", "Jacques Kramp"]
 description = "Cross-platform multi-client UDP proxy"
-homepage = "https://github.com/neosmart/udpproxy"
-repository = "https://github.com/neosmart/udpproxy"
+homepage = "https://github.com/godwin42sh/udpproxy/"
+repository = "https://github.com/godwin42sh/udpproxy/"
 readme = "README.md"
 keywords = ["proxy", "udp", "networking"]
 categories = ["command-line-utilities", "network-programming"]
@@ -13,3 +14,7 @@ license = "MIT"
 [dependencies]
 getopts = "0.2"
 rand = "0.3"
+reqwest = "0.11"
+tokio = { version = "1.0", features = ["full"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
