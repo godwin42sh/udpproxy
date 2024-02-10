@@ -14,7 +14,7 @@ pub async fn hook_on_lauch() -> Result<(), Box<dyn Error>> {
 
 	tokio::spawn(async {
 		let config = Config::new().map_err(|_| "Config anavailable").unwrap();
-		let mut interval = tokio::time::interval(Duration::from_secs(20));
+		let mut interval = tokio::time::interval(Duration::from_secs(config.time_tick_check_stop));
 
 		loop {
 			interval.tick().await;
