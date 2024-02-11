@@ -26,7 +26,6 @@ pub async fn hook_on_lauch() -> Result<(), Box<dyn Error>> {
 }
 
 pub async fn hook_on_packet_received(config: &Config) -> Result<(), Box<dyn Error>> {
-  println!("Packet received");
 	let now = SystemTime::now();
 
 	unsafe {
@@ -36,8 +35,6 @@ pub async fn hook_on_packet_received(config: &Config) -> Result<(), Box<dyn Erro
 		}
 		else {
 			let elapsed = now.duration_since(LAST_TIME_QUERY.unwrap()).unwrap();
-			println!("Time: {:?}", LAST_TIME_QUERY.unwrap());
-			println!("Elapsed: {:?}", elapsed);
 
 			if elapsed.as_secs() > 20 {
 				LAST_TIME_QUERY = Some(now);

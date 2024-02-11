@@ -13,7 +13,7 @@ pub struct ChartRelease {
 	status: String,
 }
 
-pub async fn make_get_request_with_token(url: &str, token: &str) -> Result<ChartRelease, Box<dyn Error>> {
+pub async fn make_get_request_with_token(url: &str, token: &str) -> Result<String, Box<dyn Error>> {
 		// Create a reqwest Client
 		let client = Client::new();
 
@@ -33,19 +33,7 @@ pub async fn make_get_request_with_token(url: &str, token: &str) -> Result<Chart
 				.text()
 		.await?;
 
-	let item: ChartRelease = serde_json::from_str(&response)?;
-
-	if item.id == "palworld-server" {
-		// println!("{:?}", item);
-		return Ok(item);
-	}
-	return Ok({
-		ChartRelease {
-			id: "".to_string(),
-			status: "".to_string(),
-		}
-	});
-	// Ok(response)
+	Ok(response)
 }
 
 pub async fn make_post_request_with_token(url: &str, token: &str, post_data: &str) -> Result<String, Box<dyn Error>> {
@@ -75,9 +63,6 @@ pub async fn make_post_request_with_token(url: &str, token: &str, post_data: &st
 }
 
 pub async fn service_start_stop(config: &Config, start: bool) -> Result<(), Box<dyn Error>> {
-	// The URL to the service status endpoint
-	// let url: &str = "http://192.168.1.97/api/v2.0/chart/release/scale";
-
 	let mut url = "".to_string();
 	url.push_str(&config.uri);
 	url.push_str("/chart/release/scale");
@@ -96,7 +81,10 @@ pub async fn service_start_stop(config: &Config, start: bool) -> Result<(), Box<
 
 	// Make the request and print the response
 	let response = make_post_request_with_token(&url, &config.token, &post_data).await?;
-	println!("Response: {}", response);
+
+	let server_state_text = if start { "Started" } else { "Stopped" };
+
+	println!("Server {}: response {}", server_state_text, response);
 
 	if start {
 		sleep(Duration::from_secs(20));
@@ -113,18 +101,21 @@ pub async fn service_start_stop(config: &Config, start: bool) -> Result<(), Box<
 }
 
 pub async fn check_service_status(config: &Config) -> Result<(), Box<dyn Error>> {
-	// The URL to the service status endpoint
-	// let url = "http://192.168.1.97/api/v2.0/chart/release/id/palworld-server";
 	let mut url = "".to_string();
 	url.push_str(&config.uri);
 	url.push_str("/chart/release/id/");
 	url.push_str(&config.service_id);
 
 	// Make the request and print the response
-		let response = make_get_request_with_token(&url, &config.token).await?;
-	println!("Response: {}", response.status);
+	let response = make_get_request_with_token(&url, &config.token).await?;
 
-	if response.status == "STOPPED" {
+	let item: ChartRelease = serde_json::from_str(&response)?;
+
+	if item.id != config.service_id {
+		return Ok(());
+	}
+
+	if item.status == "STOPPED" {
 		service_start_stop(config, true).await?;
 	} else {
 		println!("Service is already running");
@@ -143,10 +134,8 @@ pub async fn check_no_traffic(config: &Config) -> Result<(), Box<dyn Error>> {
 			let elapsed: Duration = now.duration_since(hooks::LAST_TIME_QUERY.unwrap()).unwrap();
 			println!("No Traffic - Elapsed: {:?}", elapsed);
 
-			if elapsed.as_secs() > 600 {
+			if elapsed.as_secs() > config.time_before_stop {
 				service_start_stop(config, false).await?;
-				// sleep(Duration::from_secs(30));
-				// check_service_status().await.unwrap();
 				hooks::LAST_TIME_QUERY = None;
 			}
 		}
