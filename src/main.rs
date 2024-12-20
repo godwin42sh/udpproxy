@@ -14,7 +14,7 @@ use tokio::runtime::Runtime;
 
 use crate::config::Config;
 
-const TIMEOUT: u64 = 3 * 60 * 100; //3 minutes
+const TIMEOUT: u64 = 3 * 60 * 100; // 3 minutes, after 10 rounds
 static mut DEBUG: bool = false;
 
 fn main() -> Result<(), Box<dyn Error>> {
