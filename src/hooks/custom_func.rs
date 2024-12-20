@@ -76,7 +76,7 @@ pub async fn service_start_stop(config: &Config, start: bool) -> Result<(), Box<
 	let mut post_data = "".to_string();
 
 	post_data.push_str("\"");
-	post_data.push_str(&post_data);
+	post_data.push_str(&config.service_id);
 	post_data.push_str("\"");
 
 	// let mut post_data = "".to_string();
