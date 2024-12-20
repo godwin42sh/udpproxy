@@ -65,22 +65,29 @@ pub async fn make_post_request_with_token(url: &str, token: &str, post_data: &st
 pub async fn service_start_stop(config: &Config, start: bool) -> Result<(), Box<dyn Error>> {
 	let mut url = "".to_string();
 	url.push_str(&config.uri);
-	url.push_str("/chart/release/scale");
+	url.push_str("/app/");
 
-	let mut post_data = "".to_string();
-
-	post_data.push_str("{\"release_name\":\"");
-	post_data.push_str(&config.service_id);
-	post_data.push_str("\",\"scale_options\":{\"replica_count\":");
 	if start {
-		post_data.push_str("1");
+		url.push_str("start");
 	} else {
-		post_data.push_str("0");
+		url.push_str("stop");
 	}
-	post_data.push_str("}}");
+	
+	// let mut post_data = "".to_string();
+
+	// post_data.push_str("{\"release_name\":\"");
+	// post_data.push_str(&config.service_id);
+	// post_data.push_str("\",\"scale_options\":{\"replica_count\":");
+	// if start {
+	// 	post_data.push_str("1");
+	// } else {
+	// 	post_data.push_str("0");
+	// }
+	// post_data.push_str("}}");
 
 	// Make the request and print the response
-	let response = make_post_request_with_token(&url, &config.token, &post_data).await?;
+	// let response = make_post_request_with_token(&url, &config.token, &post_data).await?;
+	let response = make_post_request_with_token(&url, &config.token, &config.service_id).await?;
 
 	let server_state_text = if start { "Started" } else { "Stopped" };
 
@@ -103,7 +110,7 @@ pub async fn service_start_stop(config: &Config, start: bool) -> Result<(), Box<
 pub async fn check_service_status(config: &Config) -> Result<(), Box<dyn Error>> {
 	let mut url = "".to_string();
 	url.push_str(&config.uri);
-	url.push_str("/chart/release/id/");
+	url.push_str("/app/id/");
 	url.push_str(&config.service_id);
 
 	// Make the request and print the response
@@ -115,7 +122,7 @@ pub async fn check_service_status(config: &Config) -> Result<(), Box<dyn Error>>
 		return Ok(());
 	}
 
-	if item.status == "STOPPED" {
+	if item.state == "STOPPED" {
 		service_start_stop(config, true).await?;
 	} else {
 		println!("Service is already running");
