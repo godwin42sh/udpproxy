@@ -73,6 +73,12 @@ pub async fn service_start_stop(config: &Config, start: bool) -> Result<(), Box<
 		url.push_str("stop");
 	}
 	
+	let mut post_data = "".to_string();
+
+	post_data.push_str("\"");
+	post_data.push_str(&post_data);
+	post_data.push_str("\"");
+
 	// let mut post_data = "".to_string();
 
 	// post_data.push_str("{\"release_name\":\"");
@@ -86,8 +92,7 @@ pub async fn service_start_stop(config: &Config, start: bool) -> Result<(), Box<
 	// post_data.push_str("}}");
 
 	// Make the request and print the response
-	// let response = make_post_request_with_token(&url, &config.token, &post_data).await?;
-	let response = make_post_request_with_token(&url, &config.token, &config.service_id).await?;
+	let response = make_post_request_with_token(&url, &config.token, &post_data).await?;
 
 	let server_state_text = if start { "Started" } else { "Stopped" };
 
