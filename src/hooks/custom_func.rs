@@ -10,7 +10,7 @@ use crate::hooks;
 #[derive(Debug, Deserialize)]
 pub struct ChartRelease {
 	id: String,
-	status: String,
+	state: String,
 }
 
 pub async fn make_get_request_with_token(url: &str, token: &str) -> Result<String, Box<dyn Error>> {
